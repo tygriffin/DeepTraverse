@@ -12,6 +12,8 @@ levelOne.deepGet("top", "nested", 0) as? Bool // true
 
 In real life, you should probably be using Codable for things like this. But deep traversal is handy for testing.
 
+Assumes traversing a JSON-like structure, such that all keys are either strings or integers.
+
 ## MIT License
 
 Copyright (c) [year] [fullname]
