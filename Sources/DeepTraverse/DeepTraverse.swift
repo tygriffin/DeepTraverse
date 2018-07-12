@@ -29,14 +29,49 @@ extension Array {
     }
 }
 
-extension DeepTraversable {
+//extension DeepTraversable {
+//    public func deepGet(_ path: JSONKeyRepresentable...) -> Any? {
+//        return self.deepGet(path)
+//    }
+//
+//    public func deepGet(_ path: [JSONKeyRepresentable]) -> Any? {
+//        var path = path
+//
+//        guard let p = path.popFront() else {
+//            return nil
+//        }
+//
+//        let next = deepNext(pathIndex: p)
+//        if path.count == 0 {
+//            return next
+//        }
+//        if let obj = next as? Dictionary<String, Any> {
+//            return obj.deepGet(path)
+//        }
+//        if let arr = next as? Array<Any> {
+//            return arr.deepGet(path)
+//        }
+//
+//        return nil
+//    }
+//}
+
+extension Dictionary where Key == String, Value == Any {
+    
     public func deepGet(_ path: JSONKeyRepresentable...) -> Any? {
         return self.deepGet(path)
     }
     
+    public func deepNext(pathIndex: JSONKeyRepresentable) -> Any? {
+        guard let key = pathIndex.jsonKeyStringValue else {
+            return nil
+        }
+        return self[key]
+    }
+    
     public func deepGet(_ path: [JSONKeyRepresentable]) -> Any? {
         var path = path
-    
+        
         guard let p = path.popFront() else {
             return nil
         }
@@ -56,16 +91,12 @@ extension DeepTraversable {
     }
 }
 
-extension Dictionary: DeepTraversable where Key == String, Value == Any {
-    public func deepNext(pathIndex: JSONKeyRepresentable) -> Any? {
-        guard let key = pathIndex.jsonKeyStringValue else {
-            return nil
-        }
-        return self[key]
+extension Array where Element == Any {
+    
+    public func deepGet(_ path: JSONKeyRepresentable...) -> Any? {
+        return self.deepGet(path)
     }
-}
-
-extension Array: DeepTraversable where Element == Any {
+    
     public func deepNext(pathIndex: JSONKeyRepresentable) -> Any? {
         guard let key = pathIndex.jsonKeyNumberValue else {
             return nil
@@ -74,5 +105,26 @@ extension Array: DeepTraversable where Element == Any {
             return nil
         }
         return self[key]
+    }
+    
+    public func deepGet(_ path: [JSONKeyRepresentable]) -> Any? {
+        var path = path
+        
+        guard let p = path.popFront() else {
+            return nil
+        }
+        
+        let next = deepNext(pathIndex: p)
+        if path.count == 0 {
+            return next
+        }
+        if let obj = next as? Dictionary<String, Any> {
+            return obj.deepGet(path)
+        }
+        if let arr = next as? Array<Any> {
+            return arr.deepGet(path)
+        }
+        
+        return nil
     }
 }
